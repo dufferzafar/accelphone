@@ -1,0 +1,78 @@
+<html>
+
+<head>
+    <title>Sensors Demo</title>
+</head>
+
+<body>
+    <p>Sampling rate</p>
+    <p id="sample_rate"></p>
+    <p id="interval"></p>
+
+    <p>Accelerometer</p>
+    <p id="Accelerometer_gx"></p>
+    <p id="Accelerometer_gy"></p>
+    <p id="Accelerometer_gz"></p>
+    <p id="Accelerometer_x"></p>
+    <p id="Accelerometer_y"></p>
+    <p id="Accelerometer_z"></p>
+
+    <p>Gyro</p>
+    <p id="Gyro_x"></p>
+    <p id="Gyro_y"></p>
+    <p id="Gyro_z"></p>
+
+    <script>
+    window.addEventListener("devicemotion", handleMotion);
+
+    var event_count = 0;
+    var last_time = 0;
+    var sample_rate = 0.0;
+
+    function handleMotion(event) {
+
+        // Calculate sampling rate
+        var d = new Date();
+        var t = d.getTime();
+
+        if (event_count % 100 == 0) {
+
+            if (last_time != 0) {
+                delta = t - last_time; //in msec
+                sample_rate = 100.0*1000/delta;
+            }
+            last_time = t;
+
+            document.getElementById('sample_rate').innerHTML = "Sensor sampling rate (samples/sec): " + sample_rate.toFixed(10);
+
+            if (event.interval != null)
+                document.getElementById('interval').innerHTML = "Data Interval (ms): " + event.interval.toFixed(10);
+
+            if (event.accelerationIncludingGravity.x != null)
+                document.getElementById('Accelerometer_gx').innerHTML = "AccelerometerIncludingGravity X-axis: " + event.accelerationIncludingGravity.x.toFixed(10);
+            if (event.accelerationIncludingGravity.y != null)
+                document.getElementById('Accelerometer_gy').innerHTML = "AccelerometerIncludingGravity Y-axis: " + event.accelerationIncludingGravity.y.toFixed(10);
+            if (event.accelerationIncludingGravity.z != null)
+                document.getElementById('Accelerometer_gz').innerHTML = "AccelerometerIncludingGravity Z-axis: " + event.accelerationIncludingGravity.z.toFixed(10);
+
+            if (event.acceleration.x != null)
+                document.getElementById('Accelerometer_x').innerHTML = "Accelerometer X-axis: " + event.acceleration.x.toFixed(10);
+            if (event.acceleration.y != null)
+                document.getElementById('Accelerometer_y').innerHTML = "Accelerometer Y-axis: " + event.acceleration.y.toFixed(10);
+            if (event.acceleration.z != null)
+                document.getElementById('Accelerometer_z').innerHTML = "Accelerometer Z-axis: " + event.acceleration.z.toFixed(10);
+
+            if (event.rotationRate.alpha != null)
+                document.getElementById('Gyro_z').innerHTML = "Gyro Z-axis: " + event.rotationRate.alpha.toFixed(10);
+            if (event.rotationRate.beta != null)
+                document.getElementById('Gyro_x').innerHTML = "Gyro X-axis: " + event.rotationRate.beta.toFixed(10);
+            if (event.rotationRate.gamma != null)
+                document.getElementById('Gyro_y').innerHTML = "Gyro Y-axis: " + event.rotationRate.gamma.toFixed(10);
+        }
+
+        event_count += 1;
+    }
+    </script>
+</body>
+
+</html>
