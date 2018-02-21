@@ -6,6 +6,7 @@
 
 <body>
     <p>Sampling rate</p>
+    <p id="event_count"></p>
     <p id="sample_rate"></p>
     <p id="interval"></p>
 
@@ -43,10 +44,11 @@
             }
             last_time = t;
 
-            document.getElementById('sample_rate').innerHTML = "Sensor sampling rate (samples/sec): " + sample_rate.toFixed(10);
+            document.getElementById('event_count').innerHTML = "Total events captured: " + event_count;
+            document.getElementById('sample_rate').innerHTML = "Sensor sampling rate (samples/sec): " + sample_rate.toFixed(3);
 
             if (event.interval != null)
-                document.getElementById('interval').innerHTML = "Data Interval (ms): " + event.interval.toFixed(10);
+                document.getElementById('interval').innerHTML = "Data Interval (ms): " + event.interval;
 
             if (event.accelerationIncludingGravity.x != null)
                 document.getElementById('Accelerometer_gx').innerHTML = "AccelerometerIncludingGravity X-axis: " + event.accelerationIncludingGravity.x.toFixed(10);
