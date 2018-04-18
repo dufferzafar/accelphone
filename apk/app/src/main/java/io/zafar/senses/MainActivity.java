@@ -1,25 +1,28 @@
 package io.zafar.senses;
 
-import android.os.Bundle;
-
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
-
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-
+import android.os.Bundle;
+import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +35,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView mStatus;
 
     private boolean logging = false;
+
+    private PrintWriter sensorWriter;
+
+    // Used to format the sensor date
+    SimpleDateFormat dateFileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.UK);
+    SimpleDateFormat logStamp = new SimpleDateFormat("HH:mm:ss.SSS", Locale.UK);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitle("My Title");
 
         // This will display the sensor readings
-        mStatus =  findViewById(R.id.status);
+        mStatus = findViewById(R.id.status);
 
         // Build a sensor
         mSensorManager= (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -79,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
                     fab.setImageResource(android.R.drawable.ic_media_pause);
 
                     // Start recording
-                    mStatus.setText("");
                     mSensorManager.registerListener(onSensorChange, mSensorAccel, SensorManager.SENSOR_DELAY_FASTEST);
 
                     // Show snackbar
@@ -92,6 +100,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Get file writing permission
+        checkAndGrantWriteExternalPermission();
+
+        // Folder to store the sensor logs & recordings
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/senses_data";
+        File sensorLogFolder = new File(path);
+
+        // Check if something is amiss
+        if (!sensorLogFolder.exists() && !sensorLogFolder.mkdirs()) {
+            Log.e(lTag, "Can not create a folder (for some reason.)");
+        }
+
+        File sensorLogFile = new File(sensorLogFolder, "accelerometer_" + dateFileName.format(new Date()) + ".csv");
+
+        try {
+            sensorLogFile.createNewFile();
+            sensorWriter = new PrintWriter(sensorLogFile);
+            Log.d(lTag, "File Created: " + sensorLogFile);
+        } catch (IOException e) {
+            Log.e(lTag, "Couldn't create file: " + sensorLogFile + "\n Error: " + e.toString());
+        }
+
+        mStatus.setText("Data will be logged to: " + sensorLogFile);
         Log.d(lTag, "Shit setup");
     }
 
@@ -117,6 +148,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void checkAndGrantWriteExternalPermission() {
+        String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        int res = this.getApplicationContext().checkCallingOrSelfPermission(permission);
+        if (res != PackageManager.PERMISSION_GRANTED) {
+            this.requestPermissions(new String[]{permission}, 1);
+        }
+    }
 
     /////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
@@ -135,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
         // Stop recording
         mSensorManager.unregisterListener(onSensorChange);
 
+        sensorWriter.flush();
         Log.d(lTag, "On Pause - Un-registering Listener");
     }
 
@@ -153,17 +192,15 @@ public class MainActivity extends AppCompatActivity {
         @Override
         synchronized public void onSensorChanged(SensorEvent event) {
 
-            // float[] values = new int[] {event.timestamp, event.values[0], event.values[1], event.values[2]};
-            // String[] values = Arrays.stream(values).mapToObj(String::valueOf).toArray(String[]::new);
-            // String t = String.join(",", values);
-
             // https://stackoverflow.com/a/9333605/2043048
             long timeInMillis = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
 
-            String t = "\n" + timeInMillis+ ", " + event.values[0] + ", " + event.values[1] + ", " + event.values[2];
+            String t = logStamp.format(new Date(timeInMillis)) + ", "
+                    + event.values[0] + ", " + event.values[1] + ", " + event.values[2];
+
+            sensorWriter.println(t);
 
             // Log.d(lTag, t);
-            mStatus.append(t);
         }
     };
 }
