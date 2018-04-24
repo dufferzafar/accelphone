@@ -1,10 +1,12 @@
 package io.zafar.senses;
 
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean logging = false;
 
     private PrintWriter sensorWriter;
+    private MediaRecorder audioRecorder;
 
     // Used to format the sensor date
     SimpleDateFormat dateFileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.UK);
@@ -90,8 +93,10 @@ public class MainActivity extends AppCompatActivity {
                     // Start recording
                     mSensorManager.registerListener(onSensorChange, mSensorAccel, SensorManager.SENSOR_DELAY_FASTEST);
 
+                    audioRecorder.start();
+
                     // Show snackbar
-                    Snackbar.make(view, "Now recording accelerometer.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Now recording accelerometer & microphone", Snackbar.LENGTH_LONG)
                             .setAction("Action", null)
                             .show();
 
@@ -100,8 +105,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Get file writing permission
-        checkAndGrantWriteExternalPermission();
+        // Get file writing & audio recording permission
+        checkRequestPermissions();
+
 
         // Folder to store the sensor logs & recordings
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/senses_data";
@@ -113,6 +119,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         File sensorLogFile = new File(sensorLogFolder, "accelerometer_" + dateFileName.format(new Date()) + ".csv");
+        // File audioFile = new File();
+
+        // Audio Recorder
+        audioRecorder = new MediaRecorder();
+        audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        audioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        audioRecorder.setOutputFile(path + "/audio_" + dateFileName.format(new Date()) + ".m4a");
+
+        try {
+            audioRecorder.prepare();
+        } catch (IOException e) {
+            Log.e(lTag, "Couldn't setup audio recording.");
+        }
 
         try {
             sensorLogFile.createNewFile();
@@ -122,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e(lTag, "Couldn't create file: " + sensorLogFile + "\n Error: " + e.toString());
         }
 
-        mStatus.setText("Data will be logged to: " + sensorLogFile);
+        mStatus.setText("Sensor data will be logged to: " + sensorLogFile);
         Log.d(lTag, "Shit setup");
     }
 
@@ -148,11 +168,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void checkAndGrantWriteExternalPermission() {
-        String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        int res = this.getApplicationContext().checkCallingOrSelfPermission(permission);
-        if (res != PackageManager.PERMISSION_GRANTED) {
-            this.requestPermissions(new String[]{permission}, 1);
+    private void checkRequestPermissions() {
+        String perm_write = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        String perm_mic = Manifest.permission.RECORD_AUDIO;
+        int r1 = this.getApplicationContext().checkCallingOrSelfPermission(perm_write);
+        int r2 = this.getApplicationContext().checkCallingOrSelfPermission(perm_mic);
+        if (r1 + r2 != PackageManager.PERMISSION_GRANTED) {
+            this.requestPermissions(new String[]{perm_write, perm_mic}, 1);
         }
     }
 
@@ -172,6 +194,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Stop recording
         mSensorManager.unregisterListener(onSensorChange);
+
+        //
+        audioRecorder.stop();
+        audioRecorder.release();
 
         sensorWriter.flush();
         Log.d(lTag, "On Pause - Un-registering Listener");
