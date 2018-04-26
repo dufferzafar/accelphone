@@ -1,0 +1,12 @@
+#!/bin/bash
+
+inotifywait -mqr --timefmt '%d/%m/%y %H:%M' --format '%T %w %f' -e close_write @.git ./ | \
+while read date time dir file;
+do
+    ext="${file##*.}"
+    if [[ "$ext" = "tex" ]]; then
+        FILECHANGE=${dir}${file}
+        echo "${date} - ${time} - $FILECHANGE"
+        make
+    fi
+done

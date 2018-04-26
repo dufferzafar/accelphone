@@ -1,27 +1,36 @@
 doc=Thesis
-all : $(doc)
 
-$(doc) : $(doc).tex
-	pdflatex $(doc).tex
-	bibtex $(doc).aux
-	pdflatex $(doc).tex
-	pdflatex $(doc).tex
-	# evince $(doc).pdf
+C=\033[1;035m # Color
+NC=\033[0m # No Color
 
-clean :
-	rm -f $(doc).log
-	rm -f $(doc).aux
-	rm -f $(doc).dvi
-	rm -f $(doc).pdf
-	rm -f $(doc).toc
-	rm -f $(doc).lof
-	rm -f $(doc).lot
-	rm -f chapter?.log
-	rm -f chapter?.aux
-	rm -f chapter?.dvi
-	rm -f chapter?.pdf
-	rm -f chapter?.toc
-	rm -f *.aux
-	rm -f $(doc).bbl
-	rm -f $(doc).blg
-	rm -f $(doc).out
+default: compile
+
+compile:
+	@latexmk -silent -pdf -pdflatex='pdflatex -interaction=nonstopmode' $(doc).tex
+
+error:
+	@latexmk -pdf -pdflatex='pdflatex -file-line-error -interaction=errorstopmode' $(doc).tex
+
+# Run the watch shell script that
+# watches the current directory for changes and builds the PDF
+.PHONY: watch
+watch:
+	@printf "$(C)Watching sources for changes$(NC)\n"
+	@./watch
+
+view:
+	@xdg-open $(doc).pdf
+
+# Clean all latex crap
+clean:
+	@rm -f *.aux
+	@rm -f *.bbl
+	@rm -f *.blg
+	@rm -f *.dvi
+	@rm -f *.fdb_latexmk
+	@rm -f *.fls
+	@rm -f *.lof
+	@rm -f *.log
+	@rm -f *.lot
+	@rm -f *.out
+	@rm -f *.toc
