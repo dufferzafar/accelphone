@@ -36,14 +36,22 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView mStatus;
 
+    // Whether the data is being logged right now
     private boolean logging = false;
 
+    // Directory where data will be stored
+    private String sensorLogFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                                         + "/senses_data";
+    private File sensorLogFolder;
+    private File sensorLogFile;
     private PrintWriter sensorWriter;
+
+    private String audioFilePath;
     private MediaRecorder audioRecorder;
 
     // Used to format the sensor date
     SimpleDateFormat dateFileName = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.UK);
-    SimpleDateFormat logStamp = new SimpleDateFormat("HH:mm:ss.SSS", Locale.UK);
+    SimpleDateFormat logLineStamp = new SimpleDateFormat("HH:mm:ss.SSS", Locale.UK);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                     mSensorManager.unregisterListener(onSensorChange);
 
                     // Show snackbar
-                    Snackbar.make(view, "Recording paused!", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Recording stopped!", Snackbar.LENGTH_LONG)
                             .setAction("Action", null)
                             .show();
 
@@ -90,9 +98,17 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     fab.setImageResource(android.R.drawable.ic_media_pause);
 
-                    // Start recording
+                    // Setup files where the data will be written to
+                    setupOutputFiles();
+
+                    // Display paths in the main view
+                    mStatus.setText("Sensor data will be logged to: \n\n" + sensorLogFile);
+                    mStatus.append("\n\n\nAudio will be logged to: \n\n" + audioFilePath);
+
+                    // Start recording Accelerometer
                     mSensorManager.registerListener(onSensorChange, mSensorAccel, SensorManager.SENSOR_DELAY_FASTEST);
 
+                    // Start recording Microphone
                     audioRecorder.start();
 
                     // Show snackbar
@@ -108,33 +124,21 @@ public class MainActivity extends AppCompatActivity {
         // Get file writing & audio recording permission
         checkRequestPermissions();
 
-
         // Folder to store the sensor logs & recordings
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/senses_data";
-        File sensorLogFolder = new File(path);
+        sensorLogFolder = new File(sensorLogFolderPath);
 
         // Check if something is amiss
         if (!sensorLogFolder.exists() && !sensorLogFolder.mkdirs()) {
             Log.e(lTag, "Can not create a folder (for some reason.)");
         }
 
-        File sensorLogFile = new File(sensorLogFolder, "accelerometer_" + dateFileName.format(new Date()) + ".csv");
-        // File audioFile = new File();
+        Log.d(lTag, "Activity Loaded");
+    }
 
-        // Audio Recorder
-        audioRecorder = new MediaRecorder();
-        audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        audioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        audioRecorder.setOutputFile(path + "/audio_" + dateFileName.format(new Date()) + ".m4a");
+    private void setupOutputFiles() {
 
         try {
-            audioRecorder.prepare();
-        } catch (IOException e) {
-            Log.e(lTag, "Couldn't setup audio recording.");
-        }
-
-        try {
+            sensorLogFile = new File(sensorLogFolder, "accelerometer_" + dateFileName.format(new Date()) + ".csv");
             sensorLogFile.createNewFile();
             sensorWriter = new PrintWriter(sensorLogFile);
             Log.d(lTag, "File Created: " + sensorLogFile);
@@ -142,8 +146,22 @@ public class MainActivity extends AppCompatActivity {
             Log.e(lTag, "Couldn't create file: " + sensorLogFile + "\n Error: " + e.toString());
         }
 
-        mStatus.setText("Sensor data will be logged to: " + sensorLogFile);
-        Log.d(lTag, "Shit setup");
+        // Audio Recorder
+        audioRecorder = new MediaRecorder();
+        audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        audioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+
+        try {
+            audioFilePath = sensorLogFolderPath + "/audio_" + dateFileName.format(new Date()) + ".m4a";
+            audioRecorder.setOutputFile(audioFilePath);
+            audioRecorder.prepare();
+            Log.d(lTag, "File Created: " + audioFilePath);
+        } catch (Exception e) {
+            Log.e(lTag, "Couldn't setup audio recording." + "\n Error: " + e.toString());
+        }
+
+        Log.d(lTag, "Files setup");
     }
 
     @Override
@@ -221,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
             // https://stackoverflow.com/a/9333605/2043048
             long timeInMillis = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
 
-            String t = logStamp.format(new Date(timeInMillis)) + ", "
+            String t = logLineStamp.format(new Date(timeInMillis)) + ", "
                     + event.values[0] + ", " + event.values[1] + ", " + event.values[2];
 
             sensorWriter.println(t);
