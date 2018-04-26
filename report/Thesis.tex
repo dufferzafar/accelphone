@@ -1,0 +1,160 @@
+\documentclass[a4paper,titlepage,openright,12pt]{report}
+\usepackage{graphicx}
+%\usepackage{epsfig}
+\usepackage[font=footnotesize]{subfig}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{makeidx}
+\usepackage[nottoc,notlot,notlof]{tocbibind}
+\usepackage{supertabular}
+\usepackage{array}
+\usepackage{setspace}
+\usepackage{enumerate}
+\usepackage{rotating}
+\usepackage{moreverb}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{captcont}
+\usepackage{verbatim}
+\usepackage{titlesec}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{lipsum}
+%\usepackage[algoruled]{algorithm2e}
+%\usepackage[figure,algoruled]{algorithm2e}
+%\usepackage[figure,boxruled]{algorithm2e}
+
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{conjecture}[theorem]{Conjecture}
+%\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{definition}[theorem]{Definition}
+%\newtheorem{Example}[theorem]{Example}
+%\newtheorem{axiom}{Axiom}
+%\newtheorem{remark}{Remark}
+%\newtheorem{exercise}{Exercise}[section]
+%\newtheorem{fact}[theorem]{Fact}
+%\newtheorem{property}[theorem]{Property}
+\setlength{\parindent}{0pt}%for paragraph spacing
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\setlength{\textheight}{8.5in}
+\pagestyle{fancy}
+% with this we ensure that the chapter and section
+% headings are in lowercase.
+%\renewcommand{\bibname}{References}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{} % delete current setting for header and footer
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+%\rfoot{\bfseries\thepage}
+\cfoot{\em $\copyright$ 2013, Indian Institute of Technology Delhi}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+\addtolength{\headheight}{2.5pt} % make space for the rule
+
+\fancypagestyle{plain}{%
+\fancyhead{} % get rid of headers on plain pages
+\fancyfoot{}
+%\rfoot{\bfseries\thepage}
+\cfoot{\em $\copyright$ 2013, Indian Institute of Technology Delhi}
+\renewcommand{\headrulewidth}{0pt} % and the line
+}
+
+%% The smart version of cleardouble page.
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+  \clearpage
+  {\pagestyle{empty}\origdoublepage}%
+}
+
+\let\cleardoublepage\clearemptydoublepage
+
+
+\date{}
+
+
+% \addtolength{\oddsidemargin}{30pt}
+% \addtolength{\evensidemargin}{-40pt}
+
+\titlespacing*{\chapter}{0pt}{-50pt}{20pt}
+\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+% \DeclareGraphicsExtensions{.pdf,.png,.jpg,.ps}
+\floatstyle{boxed}
+\restylefloat{figure}
+\setcounter{lofdepth}{2}
+\setcounter{lotdepth}{2}
+
+\newtheorem{claim}{Claim}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{defn}{Definition}[section]
+\newtheorem{fact}{Fact}[section]
+
+\graphicspath{{./figures/}}
+\begin{document}
+
+%\begin{comment}
+% Begin title page
+\include{titlepage}
+%\newpage
+%\cleardoublepage
+\onehalfspacing
+\thispagestyle{empty}
+
+\normalfont
+\include{certificate}
+\thispagestyle{empty}
+%\include{acknowledgement}
+\thispagestyle{empty}
+
+
+% \setcounter{page}{1}
+% \pagenumbering{roman}
+\thispagestyle{empty}
+\include{abstract}
+
+\thispagestyle{empty}
+\include{acknowledgement}
+
+\thispagestyle{empty}
+\tableofcontents
+
+\thispagestyle{empty}
+
+\listoffigures
+
+\listoftables
+%\end{comment}
+
+\thispagestyle{empty}
+\cleardoublepage
+\onehalfspacing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+%You may have as many chapters as you please. This is just for reference.
+
+\include{chapter1}
+
+\include{chapter2}
+
+\include{chapter3}
+
+\include{chapter4}
+
+\include{chapter5}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+%\appendix
+%\include{appendix}
+
+\end{document}
+
