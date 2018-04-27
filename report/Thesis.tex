@@ -98,8 +98,9 @@
 % \addtolength{\oddsidemargin}{30pt}
 % \addtolength{\evensidemargin}{-40pt}
 
-\titlespacing*{\chapter}{0pt}{-50pt}{20pt}
-\titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-100pt}{10pt}
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+% \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{0pt}{\Huge}
 % \DeclareGraphicsExtensions{.pdf,.png,.jpg,.ps}
 
 \floatstyle{boxed}
@@ -161,8 +162,6 @@
 \include{chapter3}
 
 \include{chapter4}
-
-\include{chapter5}
 
 \bibliographystyle{plain}
 \bibliography{biblio}
