@@ -24,6 +24,7 @@
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{lipsum}
+\usepackage{changepage}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -132,7 +133,7 @@
 \onehalfspacing
 \normalfont
 \thispagestyle{empty}
-\include{abstract}
+\include{ch0-abstract}
 
 % \thispagestyle{empty}
 % \include{acknowledgement}
@@ -155,12 +156,16 @@
 \setcounter{page}{1}
 \pagenumbering{arabic}
 
-\include{chapter1}
+% Intro & Background
+\include{ch1-intro}
 
-\include{chapter2}
+% Related Work
+\include{ch2-literature}
 
+% My Work
 \include{chapter3}
 
+% Conclusion & Future Work
 \include{chapter4}
 
 \bibliographystyle{plain}
