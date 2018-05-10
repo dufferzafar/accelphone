@@ -44,8 +44,12 @@ public class MainActivity extends AppCompatActivity {
     private String sensorLogFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                                          + "/senses_data";
     private File sensorLogFolder;
+
     private File accLogFile;
     private PrintWriter accWriter;
+
+    private File gyrLogFile;
+    private PrintWriter gyrWriter;
 
     private String audioFilePath;
     private MediaRecorder audioRecorder;
@@ -102,9 +106,9 @@ public class MainActivity extends AppCompatActivity {
         // Add a FAB
         final FloatingActionButton fab = findViewById(R.id.fab);
 
-        // if (sensorAcc == null || sensorGyr == null) {
-        //     fab.setEnabled(false);
-        // }
+        if (sensorAcc == null || sensorGyr == null) {
+            fab.setEnabled(false);
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,14 +137,17 @@ public class MainActivity extends AppCompatActivity {
                     setupOutputFiles();
 
                     // Display paths in the main view
-                    mStatus.append("Sensor data will be logged to: \n\n" + accLogFile);
-                    mStatus.append("\n\n\nAudio will be logged to: \n\n" + audioFilePath);
+                    mStatus.append("Accelerometer data logged to: \n\n" + accLogFile);
+                    mStatus.append("\n\nGyroscope data logged to: \n\n" + gyrLogFile);
+                    mStatus.append("\n\nAudio logged to: \n\n" + audioFilePath);
 
                     // Start recording Accelerometer
                     mSensorManager.registerListener(onAccChange, sensorAcc, SensorManager.SENSOR_DELAY_FASTEST);
 
-                    // // and the Gyroscope
-                    // mSensorManager.registerListener(onAccChange, sensorGyr, SensorManager.SENSOR_DELAY_FASTEST);
+                    // and the Gyroscope
+                    // TODO: Change this to Gyro!
+                    // mSensorManager.registerListener(onGyrChange, sensorAcc, SensorManager.SENSOR_DELAY_FASTEST);
+                    mSensorManager.registerListener(onGyrChange, sensorGyr, SensorManager.SENSOR_DELAY_FASTEST);
 
                     // Start recording Microphone
                     audioRecorder.start();
@@ -178,7 +185,14 @@ public class MainActivity extends AppCompatActivity {
 
             accWriter = new PrintWriter(accLogFile);
 
+            gyrLogFile = new File(sensorLogFolder,
+                    "gyroscope_" + dateFileName.format(new Date()) + ".csv");
+            gyrLogFile.createNewFile();
+
+            gyrWriter = new PrintWriter(gyrLogFile);
+
             Log.d(lTag, "File Created: " + accLogFile);
+            Log.d(lTag, "File Created: " + gyrLogFile);
         } catch (IOException e) {
             Log.e(lTag, "Couldn't create file: " + accLogFile + "\n Error: " + e.toString());
         }
@@ -249,12 +263,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Stop recording
         mSensorManager.unregisterListener(onAccChange);
+        mSensorManager.unregisterListener(onGyrChange);
 
         // Cleanup!
         try {
             audioRecorder.stop();
             audioRecorder.release();
+
             accWriter.flush();
+            gyrWriter.flush();
         } catch (Exception e) {
             Log.d(lTag, "Bad cleanup");
         }
@@ -266,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
     /////////////////////////////////////////////////////////////////
 
 
-    // This listens for the incoming sensor events
+    // This listens for accelerometer events
     private SensorEventListener onAccChange = new SensorEventListener() {
 
         @Override
@@ -290,4 +307,27 @@ public class MainActivity extends AppCompatActivity {
             // Log.d(lTag, t);
         }
     };
+
+    // This listens for gyroscope events
+    private SensorEventListener onGyrChange = new SensorEventListener() {
+
+        @Override
+        public void onAccuracyChanged(Sensor arg0, int arg1) {
+        }
+
+        @Override
+        synchronized public void onSensorChanged(SensorEvent event) {
+
+            // https://stackoverflow.com/a/9333605/2043048
+            long timeInMillis = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
+
+            String t = logLineStamp.format(new Date(timeInMillis)) + ", "
+                    + event.values[0] + ", " + event.values[1] + ", " + event.values[2];
+
+            gyrWriter.println(t);
+
+            // Log.d(lTag, t);
+        }
+    };
+
 }
