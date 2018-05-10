@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     final private String lTag = "Senses";
 
     private SensorManager mSensorManager;
-    private Sensor mSensorAccel;
+    private Sensor sensorAcc;
+    private Sensor sensorGyr;
 
     private TextView mStatus;
 
@@ -43,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private String sensorLogFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                                          + "/senses_data";
     private File sensorLogFolder;
-    private File sensorLogFile;
-    private PrintWriter sensorWriter;
+    private File accLogFile;
+    private PrintWriter accWriter;
 
     private String audioFilePath;
     private MediaRecorder audioRecorder;
@@ -70,11 +71,41 @@ public class MainActivity extends AppCompatActivity {
         mStatus = findViewById(R.id.status);
 
         // Build a sensor
-        mSensorManager= (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensorAccel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);  // Sensor.TYPE_ALL
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorGyr = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        mStatus.setText("");
+
+        if (sensorAcc != null) {
+            mStatus.append(
+                    "Accelerometer Found: " + "\n\n"
+                            + "Name: " + sensorAcc.getName() + "\n"
+                            + "Vendor: " + sensorAcc.getVendor() + "\n"
+                            + "---------------------------------\n\n"
+            );
+        } else {
+            mStatus.append("NO Accelerometer Found. \n\n");
+        }
+
+        if (sensorGyr != null) {
+            mStatus.append(
+                    "Gyroscope Found: " + "\n\n"
+                            + "Name: " + sensorGyr.getName() + "\n"
+                            + "Vendor: " + sensorGyr.getVendor() + "\n"
+                            + "---------------------------------\n\n"
+            );
+        } else {
+            mStatus.append("NO Gyroscope Found. \n\n");
+        }
 
         // Add a FAB
         final FloatingActionButton fab = findViewById(R.id.fab);
+
+        // if (sensorAcc == null || sensorGyr == null) {
+        //     fab.setEnabled(false);
+        // }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     fab.setImageResource(android.R.drawable.ic_media_play);
 
                     // Stop recording
-                    mSensorManager.unregisterListener(onSensorChange);
+                    mSensorManager.unregisterListener(onAccChange);
 
                     // Show snackbar
                     Snackbar.make(view, "Recording stopped!", Snackbar.LENGTH_LONG)
@@ -102,11 +133,14 @@ public class MainActivity extends AppCompatActivity {
                     setupOutputFiles();
 
                     // Display paths in the main view
-                    mStatus.setText("Sensor data will be logged to: \n\n" + sensorLogFile);
+                    mStatus.append("Sensor data will be logged to: \n\n" + accLogFile);
                     mStatus.append("\n\n\nAudio will be logged to: \n\n" + audioFilePath);
 
                     // Start recording Accelerometer
-                    mSensorManager.registerListener(onSensorChange, mSensorAccel, SensorManager.SENSOR_DELAY_FASTEST);
+                    mSensorManager.registerListener(onAccChange, sensorAcc, SensorManager.SENSOR_DELAY_FASTEST);
+
+                    // // and the Gyroscope
+                    // mSensorManager.registerListener(onAccChange, sensorGyr, SensorManager.SENSOR_DELAY_FASTEST);
 
                     // Start recording Microphone
                     audioRecorder.start();
@@ -138,12 +172,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupOutputFiles() {
 
         try {
-            sensorLogFile = new File(sensorLogFolder, "accelerometer_" + dateFileName.format(new Date()) + ".csv");
-            sensorLogFile.createNewFile();
-            sensorWriter = new PrintWriter(sensorLogFile);
-            Log.d(lTag, "File Created: " + sensorLogFile);
+            accLogFile = new File(sensorLogFolder,
+                    "accelerometer_" + dateFileName.format(new Date()) + ".csv");
+            accLogFile.createNewFile();
+
+            accWriter = new PrintWriter(accLogFile);
+
+            Log.d(lTag, "File Created: " + accLogFile);
         } catch (IOException e) {
-            Log.e(lTag, "Couldn't create file: " + sensorLogFile + "\n Error: " + e.toString());
+            Log.e(lTag, "Couldn't create file: " + accLogFile + "\n Error: " + e.toString());
         }
 
         // Audio Recorder
@@ -211,13 +248,17 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         // Stop recording
-        mSensorManager.unregisterListener(onSensorChange);
+        mSensorManager.unregisterListener(onAccChange);
 
-        //
-        audioRecorder.stop();
-        audioRecorder.release();
+        // Cleanup!
+        try {
+            audioRecorder.stop();
+            audioRecorder.release();
+            accWriter.flush();
+        } catch (Exception e) {
+            Log.d(lTag, "Bad cleanup");
+        }
 
-        sensorWriter.flush();
         Log.d(lTag, "On Pause - Un-registering Listener");
     }
 
@@ -226,11 +267,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     // This listens for the incoming sensor events
-    private SensorEventListener onSensorChange = new SensorEventListener() {
+    private SensorEventListener onAccChange = new SensorEventListener() {
 
         @Override
         public void onAccuracyChanged(Sensor arg0, int arg1) {
-
         }
 
         @Override
@@ -239,10 +279,13 @@ public class MainActivity extends AppCompatActivity {
             // https://stackoverflow.com/a/9333605/2043048
             long timeInMillis = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
 
+            // String name = event.sensor.getName();
+            // name + ","
+
             String t = logLineStamp.format(new Date(timeInMillis)) + ", "
                     + event.values[0] + ", " + event.values[1] + ", " + event.values[2];
 
-            sensorWriter.println(t);
+            accWriter.println(t);
 
             // Log.d(lTag, t);
         }

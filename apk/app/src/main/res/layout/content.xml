@@ -20,6 +20,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="1.0"
-            android:text="Sensor readings will be displayed here" />
+            android:text="Sensor readings will be displayed here"
+            android:textSize="18sp" />
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
