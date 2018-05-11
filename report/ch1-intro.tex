@@ -1,3 +1,4 @@
+
 \chapter{Introduction}
 
 As mobile phones become more and more ubiquitous, they are no longer used just for communication purposes but also as personalized computing devices, since a smartphone offers a mix of functions ranging from telephony and internet connectivity to use as a camera.
@@ -26,12 +27,29 @@ The goal of this project is to explore how MEMS accelerometers can be used as mi
 
 Accelerometers in smartphones are based on Micro Electro Mechanical Systems (MEMS) design, which emulate mechanical parts through micro-machining technology \textbf{[CITE]}. At their core, the MEMS accelerometers have a sensing mass, suspended with springs, which gets displaced due to forces (that cause acceleration.) It was shown in \cite{walnut} that accelerometers are susceptible to acoustic interferences, i.e. an acoustic wave can exert a force on the sensor that is strong enough to displace the sensing mass affecting the sensor's output.
 
-% \section{Accel on Mobile Phones}
+\section{Sensors on an Android Phone}
+\label{ch1-intro-android}
+% \section{Android's Permission Model}
+
+Android is a mobile operating system from Google. Launched in 2008, it's growth paralleled that of smartphones themselves. It has the majority marketshare today with around 85\% of all smartphones coming with Android installed (as of 2017.) \cite{androidshare}
+
+One of the reasons of Android's growth are its permissive APIs - applications on this platform enjoy a lot more freedom compared to iOS and even though new features (to both hardware and software) are added in a quest to increase the user experience, the security \& privacy preserving aspects take a back seat and do not improve at the same pace.
+
+Applications that require access to a particular hardware capability need to ask permission from the user to be able to use it. This is the core line of defense that prevents malicious applications from being able to abuse critical sources of information like camera, microphone, SMS etc.
+
+However, sensors like accelerometer, gyroscope etc. do not require a special permission and can be accessed by any application, in both foreground and background. This allows an attacker to use data from these zero-permission sensors maliciously without any sort of consent from the user.
 
 % What they're used for etc. Mention the limitations?
 
-\section{Android's Permission Model}
+% One such problem is that of Android's Permission Model -
+
+
+% This allows users to
+
+
+% One problem is that the pool of sensors embedded in smartphones may un- intentionally leak sensitive information. For example, sensors that are accessible without user permissions, so-called zero-permission sensors, may be exploited by an attacker, without the knowledge of the user. The scenario is analogous to other widely known side-channel attacks which exploit unintentional (physi- cal) leakage. For example, this can be used to extract cryptographic keys [7]. In our case, the unintentional leakage from sensors reveals privacy-related informa- tion about the user, such as personal identification number (PIN) or movement patterns.
+
+
+% Zero permission sensors
+
 Also mention the potential fix in Android P
-
-\lipsum[2]
-

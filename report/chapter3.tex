@@ -56,7 +56,28 @@ H & BALF-NRG01D3  & 50 Ω balun with integrated harmonic filter \\ \hline
 
 \newpage
 
-By default, the SensorTile comes loaded
+% By default, the SensorTile comes loaded
+The LSM6DSM sensor on the SensorTile board is the accelerometer and is capable of capturing data at a maximum rate of.
+
+To interface with the sensor hardware, there are three available firmwares for the board:
+
+\begin{enumerate}
+    \item DataLogger
+    \item AudioLog
+    \item ALLMEMS
+\end{enumerate}
+
+Our goals with the SensorTile were two fold:
+
+\begin{enumerate}
+\item Gather data at the maximum rate possible.
+\item Record both motion sensors and microphone at the same time (so that we could )
+\end{enumerate}
+
+We were unable to get either of these tasks working.
+
+The firmware is recent, and the documentation is very scarce.
+
 
 \newpage
 \section{Android App}
