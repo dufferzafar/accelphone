@@ -1,4 +1,4 @@
-\chapter{Work Done}
+\chapter{Sensor Data}
 
 %Replace \lipsum with text.
 % You may have as many sections as you please. This is just for reference.
@@ -62,27 +62,64 @@ The LSM6DSM sensor on the SensorTile board is the accelerometer and is capable o
 To interface with the sensor hardware, there are three available firmwares for the board:
 
 \begin{enumerate}
-    \item DataLogger
-    \item AudioLog
-    \item ALLMEMS
+    \item DataLogger - allows recording motion sensor data
+    \item AudioLog - allows recording onboard microphone
+    \item ALLMEMS - allows SensorTile to be controlled via BlueNRG android app
 \end{enumerate}
 
 Our goals with the SensorTile were two fold:
 
 \begin{enumerate}
 \item Gather data at the maximum rate possible.
-\item Record both motion sensors and microphone at the same time (so that we could )
+\item Record both motion sensors and microphone at the same time (so that we could have a baseline to compare the sensor recordings to.)
 \end{enumerate}
 
-We were unable to get either of these tasks working.
+We didn’t succeed in achieving either of these goals as neither of the three listed stock firmwares have the capabilities that we desired. All three firmwares restricted the sensor sampling rate to around 200Hz (similar to what we would get on Android.) Another restriction was the board only allows either motion sensors OR microphone to be recorded but not both simulataneously.
 
-The firmware is recent, and the documentation is very scarce.
-
+Even though these firmwares are open-source, the documentation is relatively scarce, making new customizations very difficult. The SensorTile kit is relatively new, so not a lot of people are working on similar things.
 
 \newpage
 \section{Android App}
-\lipsum[1]
 
-\newpage
-\section{Analysis \& Results}
-\lipsum[1]
+After not being able to get the SensorTile working as a better source for data, we turned back to Android and it's limited 200Hz sampling rate.
+
+Our goals were again, to gather sensor data at the fastest rate possible and to also capture the microphone simulataneously. Since android has a plethora of apps for almost any purpose, we first tried to find an existing application that could fit our needs, but after trying out about a dozen of the apps, we found that all of them suffered from similar issues: they either didn’t have fine grained control over sampling rate for sensors Or didn’t allow both motion sensors \& microphone to be recorded at the same time.
+
+So we designed our own application that can record Accelerometer, Gyroscope \& Microphone simultaneously at the maximum rate offered by Android. Data from the sensors is saved to separate files on disk (CSV for motion sensors and M4A for microphone.)
+
+Figure \ref{fig:android_app_main} shows the design of our application.
+
+\begin{figure}[H] \begin{center}
+\includegraphics[scale=0.175]{android_app_main}
+\caption{Sensor Data Recording App (main view)}
+\label{fig:android_app_main}
+
+% \begin{minipage}[b]{0.3\textwidth}
+%   \includegraphics[width=\textwidth]{android_app_main}
+%   \caption{Picture 1}
+%   \label{fig:1}
+% \end{minipage}
+
+% \begin{minipage}[b]{0.3\textwidth}
+%   \includegraphics[width=\textwidth]{android_app_main}
+%   \caption{Picture 2}
+%   \label{fig:2}
+% \end{minipage}
+
+\end{center} \end{figure}
+
+% \begin{figure}[H] \begin{center}
+% \includegraphics[scale=0.15]{android_app_files}
+% \caption{Sensor Data Recording App (storage of files)}
+% \label{fig:android_app_files}
+% \end{center} \end{figure}
+
+% \subfloat[Sensor Data Recording App (main view) \label{fig:1}]{%
+% \includegraphics[width=0.5]{android_app_main.png}
+% }
+% \hfill
+% \subfloat[Sensor Data Recording App (main view) \label{fig:2}]{%
+% \includegraphics[width=0.5]{android_app_main.png}
+% }
+% \caption{Main figure caption}
+

@@ -3,6 +3,7 @@
 \usepackage{graphicx}
 %\usepackage{epsfig}
 
+\usepackage{subcaption}
 \usepackage[font=footnotesize]{subfig}
 \usepackage{float}
 \usepackage{fancyhdr}
@@ -25,6 +26,10 @@
 \usepackage{hyperref}
 \usepackage{lipsum}
 \usepackage{changepage}
+\usepackage{wrapfig}
+
+% For tables
+\usepackage{booktabs}
 
 \usepackage[semicolon,numbers]{natbib}
 
@@ -106,10 +111,10 @@
 % \titleformat{\chapter}[display]{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{0pt}{\Huge}
 % \DeclareGraphicsExtensions{.pdf,.png,.jpg,.ps}
 
-\floatstyle{boxed}
-\restylefloat{figure}
-\setcounter{lofdepth}{2}
-\setcounter{lotdepth}{2}
+% \floatstyle{boxed}
+% \restylefloat{figure}
+% \setcounter{lofdepth}{2}
+% \setcounter{lotdepth}{2}
 
 % Commands to be used later?
 \newtheorem{claim}{Claim}[section]
@@ -164,12 +169,16 @@
 % Related Work
 \include{ch2-literature}
 
-% My Work
-\include{chapter3}
+% Data Collection
+\include{ch3-data}
 
-% Conclusion & Future Work
-\include{chapter4}
+% Analysis
+\include{ch4-analysis}
 
+% Conclusion
+\include{ch5-conclusion}
+
+\def\bibfont{\footnotesize}
 \bibliographystyle{unsrtnat}
 \bibliography{biblio}
 

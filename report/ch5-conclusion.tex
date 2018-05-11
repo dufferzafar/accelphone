@@ -1,0 +1,16 @@
+\chapter{Conclusions}
+
+After not being able to get a high frequency sensor data source, we performed experiments on a typical Android phone and found that motion sensors found in such devices are in fact susceptible to acoustic signals (to varying degree.)
+
+Now the question remains whether they can be used to eavesdrop human speech? It is clear that since the sampling rate on the phone is low, it is not possible to directly use the sensor signals in any way.
+
+\section{Future Work}
+
+As in \cite{gyrophone} the next step is to apply signal processing techniques like noise removal, feature extraction and then machine learning algorithms to see whether the data being sensed is accurate enough to actually be of use.
+
+Since we found that both accelerometer \& gyroscopes are susceptible to audio signals, we could also look into how the data from these sensors could be combined.
+
+During our experiments, we also did not try anechoic chambers because existing research \cite{gyrophone} found that they didn’t really affect the results, but we could still explore that.
+
+
+
