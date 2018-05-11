@@ -7,11 +7,11 @@ We use Python and it's scientific suite (Numpy, Scipy, Pandas etc.) to perform a
 
 Our android application stores the audio files in M4A format because that is what the Android APIs allow, but to make processing easier we use the FFmpeg tool to convert these M4As to WAV files as there are a lot more libraries that support WAV out of the box.
 
-The experimentation was straightforward - try playing loud audio signal in the vicinity of the phoen, and see if the accelerometer data shows a response.
+The experimentation was straightforward - try playing loud audio signal in the vicinity of the phone, and see if the accelerometer data shows a response.
 
 According to the Nyquist sampling theorem a sampling frequency f enables us to reconstruct signals at frequencies of up to f/2. Since the frequency of an Android motion sensor is limited to be 200Hz, this allows us to directly sense audio signals of up to 100 Hz.
 
-But, there is also a separate effect of Aliasing \cite{gyrophone} - a phenomenon where for a sinusoid of frequency F, sampled with frequency f, the resulting samples are indistinguishable from those of another sinusoid of frequency | F − n*f |, for any integer N. The values corresponding to N != 0 are called images or aliases of frequency f. An undesirable phenomenon in general, here aliasing allows us to sense audio signals having frequencies which are higher than 100 Hz, thereby extracting more information from the gyroscope readings.
+But, there is also a separate effect of Aliasing \cite{gyrophone} - a phenomenon where for a sinusoid of frequency F, sampled with frequency f, the resulting samples are indistinguishable from those of another sinusoid of frequency \[|F - N*f|\] for any integer N. The values corresponding to N != 0 are called images or aliases of frequency f. An undesirable phenomenon in general, here aliasing allows us to sense audio signals having frequencies which are higher than 100 Hz, thereby extracting more information from the gyroscope readings.
 
 So, if we play a tone of 270Hz near an accelerometer (or a gyroscope for that matter) we expect to see peaks in the Fast Fourier Transform curve of the signal at around 70Hz.
 
