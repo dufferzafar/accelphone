@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                     audioRecorder.start();
 
                     // Show snackbar
-                    Snackbar.make(view, "Now recording accelerometer & microphone", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Now recording accelerometer, gyroscope & microphone", Snackbar.LENGTH_LONG)
                             .setAction("Action", null)
                             .show();
 
