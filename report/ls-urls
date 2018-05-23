@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+# Print all URLs being used in the various tex files
+
+import re
+import subprocess
+
+RE_URL = re.compile(r"\\href\{([^\}]*)\}")
+
+URLs = []
+
+for file in subprocess.check_output(["git", "ls-files"]).split("\n"):
+    if file.endswith(".tex"):
+        with open(file) as inpt:
+            URLs.extend(RE_URL.findall(inpt.read()))
+
+# TODO: Check that all URLs exist
+print("\n".join(sorted(URLs)))
